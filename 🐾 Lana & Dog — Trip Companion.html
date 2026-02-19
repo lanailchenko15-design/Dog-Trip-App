@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐾 Lana & Dog — Trip Companion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #f5efe6;
+    --dune: #e8ddd0;
+    --bark: #5c4033;
+    --bark-light: #8b6355;
+    --sea: #3a7d8c;
+    --sea-light: #5fa8b8;
+    --sea-pale: #d6edf2;
+    --grass: #4a7c59;
+    --grass-pale: #d4e8db;
+    --gold: #c9963a;
+    --gold-pale: #f5e6cc;
+    --warning: #c0392b;
+    --warning-pale: #fdecea;
+    --text: #2c1f18;
+    --text-mid: #5c4a40;
+    --text-light: #9b8880;
+    --white: #fdfaf7;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(92,64,51,0.10);
+    --shadow-lg: 0 6px 28px rgba(92,64,51,0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--bark);
+    color: var(--white);
+    padding: 20px 24px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.02em;
+  }
+
+  .logo span { color: var(--gold); }
+
+  .trip-toggle {
+    display: flex;
+    gap: 8px;
+  }
+
+  .trip-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .trip-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bark);
+    font-weight: 700;
+  }
+
+  .trip-meta {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.55);
+    margin-top: 2px;
+    padding-bottom: 14px;
+  }
+
+  /* ── NAV TABS ── */
+  nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.55);
+    padding: 10px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .tab-btn.active {
+    color: var(--white);
+    border-bottom-color: var(--gold);
+  }
+
+  .tab-btn:hover:not(.active) {
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── TRIP PANEL ── */
+  .trip-panel { display: none; }
+  .trip-panel.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid transparent;
+  }
+
+  .card.sea { border-left-color: var(--sea); }
+  .card.grass { border-left-color: var(--grass); }
+  .card.gold { border-left-color: var(--gold); }
+  .card.bark { border-left-color: var(--bark); }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    gap: 10px;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .card-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    margin-top: 2px;
+  }
+
+  .badge {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 10px;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .badge-green { background: var(--grass-pale); color: var(--grass); }
+  .badge-blue { background: var(--sea-pale); color: var(--sea); }
+  .badge-gold { background: var(--gold-pale); color: var(--gold); }
+  .badge-red { background: var(--warning-pale); color: var(--warning); }
+  .badge-grey { background: var(--dune); color: var(--text-mid); }
+
+  .card-body { font-size: 0.85rem; color: var(--text-mid); line-height: 1.65; }
+
+  .card-body p { margin-bottom: 6px; }
+  .card-body p:last-child { margin-bottom: 0; }
+
+  .detail-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.82rem;
+    align-items: flex-start;
+  }
+
+  .detail-label {
+    color: var(--text-light);
+    font-weight: 500;
+    min-width: 90px;
+    flex-shrink: 0;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-top: 1px;
+  }
+
+  .detail-val { color: var(--text-mid); }
+
+  .warning-box {
+    background: var(--warning-pale);
+    border: 1px solid rgba(192,57,43,0.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    color: var(--warning);
+    line-height: 1.6;
+  }
+
+  .warning-box strong { display: block; margin-bottom: 4px; font-size: 0.88rem; }
+
+  .info-box {
+    background: var(--sea-pale);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    color: var(--sea);
+    line-height: 1.6;
+  }
+
+  .info-box strong { display: block; margin-bottom: 4px; }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--bark);
+    margin-bottom: 6px;
+    margin-top: 8px;
+  }
+
+  .section-desc {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-bottom: 20px;
+  }
+
+  /* ── LINKS ── */
+  a { color: var(--sea); text-decoration: none; border-bottom: 1px solid var(--sea-pale); }
+  a:hover { border-bottom-color: var(--sea); }
+
+  /* ── DOG POLICY PILLS ── */
+  .policy-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-top: 6px;
+  }
+
+  .policy-all-year { background: var(--grass-pale); color: var(--grass); }
+  .policy-lead { background: var(--gold-pale); color: var(--gold); }
+  .policy-restricted { background: var(--warning-pale); color: var(--warning); }
+
+  /* ── ROUTE CARD ── */
+  .route-step {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+
+  .route-step-num {
+    background: var(--bark);
+    color: var(--white);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .route-step-body { flex: 1; }
+  .route-step-title { font-weight: 600; font-size: 0.85rem; color: var(--text); }
+  .route-step-detail { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; line-height: 1.5; }
+
+  /* ── PRACTICAL ── */
+  .practical-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 500px) {
+    .practical-grid { grid-template-columns: 1fr; }
+  }
+
+  .practical-tile {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .practical-tile .icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .practical-tile .p-title { font-weight: 700; font-size: 0.85rem; color: var(--text); margin-bottom: 4px; }
+  .practical-tile .p-val { font-size: 0.8rem; color: var(--sea); font-weight: 500; }
+  .practical-tile .p-sub { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; }
+
+  /* ── EXPAND ── */
+  .expand-btn {
+    background: none;
+    border: none;
+    color: var(--sea);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .expand-content { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--dune); }
+  .expand-content.open { display: block; }
+
+  /* ── TIDES CALLOUT ── */
+  .tide-callout {
+    background: linear-gradient(135deg, var(--sea) 0%, var(--bark) 100%);
+    color: var(--white);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .tide-callout .tide-icon { font-size: 2.2rem; flex-shrink: 0; }
+  .tide-callout .tide-text .t-head { font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 4px; }
+  .tide-callout .tide-text .t-sub { font-size: 0.78rem; opacity: 0.85; line-height: 1.5; }
+  .tide-callout a { color: rgba(255,255,255,0.9); border-bottom-color: rgba(255,255,255,0.3); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .header-top { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .trip-toggle { align-self: flex-end; }
+    .card-header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="logo">🐾 Lana <span>&</span> Dog</div>
+      <div class="trip-meta" id="trip-meta-header">Cornwall · Somerset · Devon · Kent · Spring 2026</div>
+    </div>
+    <div class="trip-toggle">
+      <button class="trip-btn active" onclick="switchTrip('newquay')">Newquay</button>
+      <button class="trip-btn" onclick="switchTrip('brean')">Brean</button>
+      <button class="trip-btn" onclick="switchTrip('devon')">Devon</button>
+      <button class="trip-btn" onclick="switchTrip('whitstable')">Whitstable</button>
+    </div>
+  </div>
+  <nav>
+    <button class="tab-btn active" onclick="switchTab('beaches')">🏖 Beaches</button>
+    <button class="tab-btn" onclick="switchTab('pubs')">🍺 Pubs & Food</button>
+    <button class="tab-btn" onclick="switchTab('walks')">🥾 Walks</button>
+    <button class="tab-btn" onclick="switchTab('routes')">🚗 Route</button>
+    <button class="tab-btn" onclick="switchTab('practical')">ℹ️ Practical</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════
+     NEWQUAY
+═══════════════════════════════════════════ -->
+<div class="trip-panel active" id="trip-newquay">
+
+  <!-- BEACHES -->
+  <div class="section active" id="newquay-beaches">
+    <div class="section-title">Beaches</div>
+    <div class="section-desc">28 March – 11 April 2026 · Fistral Rise, TR7 1PH</div>
+
+    <div class="warning-box">
+      <strong>⚠️ Hemlock Water Dropwort Warning — Fistral Beach</strong>
+      In early 2025, toxic roots washed up at Fistral and Little Fistral, causing serious illness and at least two dog fatalities. Check current status before visiting: call Newquay Town Council on <strong>01637 878930</strong> or check their social media.
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Fistral Beach</div>
+          <div class="card-subtitle">2-min walk from accommodation</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">750m golden sand</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">No restrictions, all year</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">TR7 1HY (expensive, camera-controlled). Cheaper: Belmont, Dane Rd, Tower Rd</span></div>
+        <div class="detail-row"><span class="detail-label">Facilities</span><span class="detail-val">Toilets, cafés, Rick Stein restaurant on beach</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead, no restrictions</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Crantock Beach</div>
+          <div class="card-subtitle">10-min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Expansive golden sand, dune-backed, River Gannel estuary</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">No restrictions, all year</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">National Trust car park (pay & display)</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Large grassy area for off-lead running. River great for paddling. Voted BBC Coast Best British Beach.</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead, no restrictions</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Holywell Bay</div>
+          <div class="card-subtitle">15-min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Large open beach, impressive dunes</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">No restrictions, all year</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">National Trust car park</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Caves & rock pools. Sacred spring in cave at south end. Links to SW Coast Path walks.</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead, no restrictions</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Mawgan Porth</div>
+          <div class="card-subtitle">15-min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Wide sandy beach, sheltered by headlands</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">No restrictions, all year</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Calmer sea, good on windy days. Links to Vale of Lanherne walk.</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead, no restrictions</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Towan Beach</div>
+          <div class="card-subtitle">10-min walk from accommodation</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Sandy, iconic island with suspension bridge</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">No restrictions, all year</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Most central beach — ideal for quick morning or evening walks into town.</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead, no restrictions</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Perranporth Beach</div>
+          <div class="card-subtitle">20-min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">3 miles of golden sand — one of Cornwall's largest</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">No restrictions during your dates. (Jul–Aug: leads 10am–5pm — not relevant)</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">The Watering Hole — only pub on a beach in the UK. Vast space, rarely crowded.</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead, no restrictions</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Porth Beach</div>
+          <div class="card-subtitle">5-min drive / 25-min walk</div>
+        </div>
+        <span class="badge badge-red">Check Dates</span>
+      </div>
+      <div class="card-body">
+        <div class="warning-box" style="margin-bottom:10px;">
+          <strong>⚠️ Restriction may apply from Easter Day (5 April)</strong>
+          Conflicting information exists. Use freely 28 Mar – 4 Apr. From 5 April onwards, verify locally before visiting.
+        </div>
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Sandy, sheltered, rock pools</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Trevelgue Head via footbridge. The Mermaid pub on beach.</span></div>
+        <span class="policy-pill policy-restricted">⚠️ Confirm from Easter onwards</span>
+      </div>
+    </div>
+
+  </div><!-- /newquay-beaches -->
+
+  <!-- PUBS -->
+  <div class="section" id="newquay-pubs">
+    <div class="section-title">Pubs & Restaurants</div>
+    <div class="section-desc">All dog-friendly · Newquay & surrounds</div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Rick Stein, Fistral</div>
+          <div class="card-subtitle">2-min walk · Headland Road, TR7 1HY</div>
+        </div>
+        <span class="badge badge-gold">Dogs Inside</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Daily 10:00–21:00</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">No bookings. Walk in; virtual queue (QR code) when busy</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Fish & chips, Singapore chilli crab burger, nasi goreng, pad Thai, moules. Doggie ice cream available.</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Pre-order takeaway via Rick Stein app to eat on the beach</span></div>
+        <div class="detail-row"><span class="detail-label">Website</span><span class="detail-val"><a href="https://rickstein.com/restaurants/fistral/" target="_blank">rickstein.com</a></span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Lewinnick Lodge</div>
+          <div class="card-subtitle">15-min walk via coast path · Pentire Headland, TR7 1QD</div>
+        </div>
+        <span class="badge badge-grey">Bar & Terrace</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Breakfast 8–11am · Main menu 12–9:30pm daily</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs welcome in bar and terrace. NOT in main dining room.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Restaurant: OpenTable or 01637 878117. Bar/terrace: first come, first served.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Fresh seafood, Cornish mussels, burgers, steaks, Sunday roasts. Excellent cocktails.</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Stunning cliff-top views. Arrive early for best bar table. Ideal for a special evening.</span></div>
+        <div class="detail-row"><span class="detail-label">Book</span><span class="detail-val"><a href="https://lewinnicklodge.co.uk/book/book-a-table/" target="_blank">lewinnicklodge.co.uk</a></span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Bowgie Inn</div>
+          <div class="card-subtitle">10-min drive · West Pentire, Crantock, TR8 5SE</div>
+        </div>
+        <span class="badge badge-grey">Outside Only</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Typically 11am–9pm spring. Check bowgie.com or 01637 830363</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Terrace and beer garden only (no indoor access). Free Bonios from bar jar.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Strongly advised. Book via DishCult or bowgie.com. Last table 19:00.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Famous Sunday roasts, homemade quiches, curries, burgers. Huge Cornish gin selection.</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Best on a dry day — incredible cliff-top views over Crantock. Perfect after Polly Joke walk.</span></div>
+        <div class="detail-row"><span class="detail-label">Book</span><span class="detail-val"><a href="https://dishcult.com/restaurant/bowgieinnn" target="_blank">dishcult.com</a></span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Fort Inn</div>
+          <div class="card-subtitle">10-min walk · 63 Fore Street, TR7 1HA</div>
+        </div>
+        <span class="badge badge-green">Dogs Inside</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Daily 11:00–23:00</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs welcome throughout. Water bowls and biscuits provided.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Advisable for weekends and Easter. <a href="https://fortinnnewquay.co.uk/book-a-table" target="_blank">fortinnnewquay.co.uk</a></span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Fish & chips, burgers, katsu curry, steaks. Famous Sunday carvery. St Austell ales.</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Stunning harbour views from beer garden. Good all-rounder for any meal.</span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Old Albion Inn</div>
+          <div class="card-subtitle">10-min drive · Langurroc Road, Crantock TR8 5RB</div>
+        </div>
+        <span class="badge badge-green">Dogs Inside</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Tue–Sun: midday–11pm. Mon: midday–6pm (no food Mondays)</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs welcome throughout. Water bowls, cosy corners. Separate non-dog area available.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Advisable. Call 01637 830243</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Traditional pub with Cornish twists. Sunday lunches a speciality. Tribute, Doom Bar, Skinner's ales.</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Partly thatched, smuggling history. Dog-friendly inside (unlike The Bowgie). 15-min walk from Crantock beach.</span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Smugglers Den Inn</div>
+          <div class="card-subtitle">10-min drive · Trebellan, Cubert, TR8 5PY</div>
+        </div>
+        <span class="badge badge-grey">Pet Bar Area</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Mon–Sat 11:30–11pm (may close 2:30–5:30 off-season). Sun 11:30–10:30pm</span></div>
+        <div class="detail-row"><span class="detail-label">Food</span><span class="detail-val">Lunch 12–2:30, dinner 6–8:30. Sun food all day 12–8pm</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dedicated pet-friendly bar area. Mention when arriving.</span></div>
+        <div class="detail-row"><span class="detail-label">Specials</span><span class="detail-val">🥧 Pie Night Wednesdays £13 · 🍔 Burger Night Fridays · Thu–Sat lunch specials £10</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Beautiful 16th-century thatched inn down a country lane. CAMRA & AA Good Pub Guide listed.</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">01637 830209</span></div>
+      </div>
+    </div>
+
+  </div><!-- /newquay-pubs -->
+
+  <!-- WALKS -->
+  <div class="section" id="newquay-walks">
+    <div class="section-title">Walks</div>
+    <div class="section-desc">All within 20 minutes of Fistral Crescent</div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Pentire Headland & Fistral Coastal</div>
+          <div class="card-subtitle">From your front door · 3–4 miles circular · Easy–Moderate</div>
+        </div>
+        <span class="badge badge-blue">From door</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">~2 hours</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">On leads near cliff edges</span></div>
+        <p>Follow the SW Coast Path north from Fistral Beach onto Pentire Headland. Pass Lewinnick Lodge (stop for coffee — dogs welcome in bar) and continue to views of Crantock and the Gannel estuary. Return the same way or loop through Pentire.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.alltrails.com/en-gb/trail/england/cornwall/fistral-crantock-and-newquay-circular" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 AllTrails Map</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Crantock to Polly Joke Circular</div>
+          <div class="card-subtitle">NT car park, Crantock · 3 miles · Easy</div>
+        </div>
+        <span class="badge badge-green">Easy</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">~1.5 hours</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead on beach; leads on cliff path</span></div>
+        <p>Crantock Beach → coast path southwest → hidden cove of Polly Joke (Porth Joke, dog-friendly all year) → loop back via West Pentire headland → The Bowgie Inn for a pit stop. Wildflowers stunning in spring.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.alltrails.com/en-gb/trail/england/cornwall/porth-joke-and-holywell-beach-circular" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 AllTrails Map</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Holywell Bay to Crantock via Kelsey Head</div>
+          <div class="card-subtitle">Holywell Bay car park · 5–6 miles one-way · Moderate</div>
+        </div>
+        <span class="badge badge-grey">Moderate</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">~3 hours</span></div>
+        <p>Spectacular coastal route. Holywell Bay → Kelsey Head (Iron Age hillfort) → Polly Joke → Crantock. Covers three dog-friendly beaches in one walk. Can shorten by turning back at Polly Joke.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.alltrails.com/en-gb/trail/england/cornwall/porth-joke-and-holywell-beach-circular" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 AllTrails Map</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Gannel Estuary Walk</div>
+          <div class="card-subtitle">Crantock village · 2–3 miles circular · Easy</div>
+        </div>
+        <span class="badge badge-green">Easy</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">~1–1.5 hours</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Tidal river — perfect for splashing in the shallows</span></div>
+        <p>Gentle riverside walk along the Gannel. Birdwatchers will enjoy wading birds. A lovely calm-day option when the coast is too windy.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.alltrails.com/en-gb/trail/england/cornwall/fistral-crantock-and-newquay-circular" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 AllTrails Map</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Watergate Bay to Newquay Coastal</div>
+          <div class="card-subtitle">Watergate Bay car park · 4 miles one-way · Moderate</div>
+        </div>
+        <span class="badge badge-grey">Moderate</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Return</span><span class="detail-val">56 bus between Newquay and Watergate Bay</span></div>
+        <p>Follow the SW Coast Path south from Watergate Bay, passing sea caves at Whipsiderry, the Iron Age hillfort on Trevelgue Head, and beaches of Porth and Lusty Glaze before arriving in Newquay.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.alltrails.com/en-gb/trail/england/cornwall/fistral-crantock-and-newquay-circular" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 AllTrails Map</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Mawgan Porth & Vale of Lanherne</div>
+          <div class="card-subtitle">Mawgan Porth beach car park · 4 miles · Easy–Moderate</div>
+        </div>
+        <span class="badge badge-green">Easy–Mod</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">~2 hours</span></div>
+        <p>Circular walk from Mawgan Porth inland through Vale of Lanherne, following River Menalhyl to St Mawgan village (13th-century church, 800-year-old Lanherne Convent). Return along the valley. Lovely mix of coast and countryside.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.google.com/maps/search/Mawgan+Porth+Vale+of+Lanherne+walk+Cornwall" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 Google Maps</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /newquay-walks -->
+
+  <!-- ROUTE -->
+  <div class="section" id="newquay-routes">
+    <div class="section-title">Driving Route</div>
+    <div class="section-desc">SW19 8ST → Newquay with your custom stops</div>
+
+    <div class="info-box">
+      <strong>🚗 SW19 → Newquay · ~290 miles · approx. 5.5–6.5 hours with stops</strong>
+      Route: Wimbledon Common → A3/M3 → A303 → A30 → Newquay. Three dog stops planned: Wimbledon Common, Teals Somerset, Heywood Wood Devon.
+    </div>
+
+    <a href="https://www.google.com/maps/dir/SW19+8ST/Windmill+Car+Park+Wimbledon+Common+SW19+5NR/Teals+Farm+Shop+BA22+7FS/Heywood+Wood+Eggesford+Forest+EX18/Fistral+Rise+Newquay+TR7+1PH" target="_blank" style="display:block; background: #3a7d8c; color: white; text-align:center; padding: 13px 20px; border-radius: 10px; font-weight: 700; font-size: 0.9rem; margin-bottom: 18px; border: none; text-decoration: none; letter-spacing: 0.03em;">
+      🗺 Open Full Route in Google Maps
+    </a>
+
+    <div class="card bark">
+      <div class="card-header">
+        <div><div class="card-title">SW19 → Newquay</div><div class="card-subtitle">3 stops · estimated 5.5–6.5 hrs total including breaks</div></div>
+      </div>
+      <div class="card-body">
+
+        <div class="route-step">
+          <div class="route-step-num">🏠</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Depart: SW19 8ST</div>
+            <div class="route-step-detail">Head to Wimbledon Common via Wimbledon Parkside / A219. Leave early — Common car park opens 7am. First stop is 5 mins away.</div>
+          </div>
+        </div>
+
+        <div class="route-step">
+          <div class="route-step-num">1</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Stop 1 · Windmill Car Park, Wimbledon Common · SW19 5NR</div>
+            <div class="route-step-detail" style="margin-bottom:8px;">~5 min from home · Suggested stop: 30–45 min</div>
+            <div class="route-step-detail">Free car park (donation scheme) directly next to the Windmill Tearooms — open daily from 9am, kitchen closes 4pm. 460 hectares of heath, woodland and ponds for a proper off-lead run before the motorway. Toilets on site. <strong>Note:</strong> dogs on leads around Queensmere Pond 1 April–31 August.</div>
+            <a href="https://www.google.com/maps/dir/SW19+8ST/Windmill+Car+Park+Wimbledon+Common+SW19+5NR" target="_blank" style="display:inline-block; margin-top:8px; background: var(--bark); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 Directions to Stop 1</a>
+          </div>
+        </div>
+
+        <div class="route-step">
+          <div class="route-step-num">↓</div>
+          <div class="route-step-body">
+            <div class="route-step-title" style="color:var(--text-light); font-weight:400;">A3 → M3 → A303 · approx. 1hr 40min driving</div>
+            <div class="route-step-detail">Join A3 south, onto M3 at Hook, then A303 west past Stonehenge (visible from road) into Somerset.</div>
+          </div>
+        </div>
+
+        <div class="route-step">
+          <div class="route-step-num">2</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Stop 2 · Teals Farm Shop & Restaurant · BA22 7FS</div>
+            <div class="route-step-detail" style="margin-bottom:8px;">~1hr 45min from Wimbledon Common · Suggested stop: 45–60 min</div>
+            <div class="route-step-detail">Just off the A303 at the North/South Cadbury junction — 1–2 minutes from the main road. Dedicated <strong>dog jog field</strong> for an off-lead run. Restaurant serves breakfast (8–11am Mon–Sat, 9–11am Sun) and lunch (12–3pm daily). Farm shop, butchery, cheese counter, deli. EV charging available. <strong>Phone:</strong> 01963 361755.</div>
+            <a href="https://www.google.com/maps/dir/Windmill+Car+Park+Wimbledon+Common+SW19+5NR/Teals+Farm+Shop+1+Orchard+Lane+South+Cadbury+BA22+7FS" target="_blank" style="display:inline-block; margin-top:8px; background: var(--bark); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 Directions to Stop 2</a>
+          </div>
+        </div>
+
+        <div class="route-step">
+          <div class="route-step-num">↓</div>
+          <div class="route-step-body">
+            <div class="route-step-title" style="color:var(--text-light); font-weight:400;">A303 → A30 into Devon · approx. 1hr 15min driving</div>
+            <div class="route-step-detail">Continue west on A303, joining A30 at Honiton. Head towards Exeter then northwest on A377 towards Barnstaple.</div>
+          </div>
+        </div>
+
+        <div class="route-step">
+          <div class="route-step-num">3</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Stop 3 · Heywood Wood, Eggesford Forest · EX18</div>
+            <div class="route-step-detail" style="margin-bottom:8px;">~1hr 15min from Teals · Suggested stop: 45–60 min</div>
+            <div class="route-step-detail">Free Forestry England car park. <strong>Access:</strong> At Eggesford Station on the A377, turn off towards Wembworthy/Winkleigh, turn right at next junction, right again at top of hill — follow narrow road to Heywood. Ancient woodland with a Norman motte and bailey castle mound and a veteran Douglas Fir planted c.1840. River Taw runs through — dogs can swim. Reasonably flat stony paths, good for a proper stretch. No facilities — bring water. <strong>Note:</strong> narrow road with potholes; busy at weekends.</div>
+            <a href="https://www.google.com/maps/dir/Teals+Farm+Shop+BA22+7FS/Heywood+Wood+Eggesford+EX18+7BE" target="_blank" style="display:inline-block; margin-top:8px; background: var(--bark); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 Directions to Stop 3</a>
+          </div>
+        </div>
+
+        <div class="route-step">
+          <div class="route-step-num">↓</div>
+          <div class="route-step-body">
+            <div class="route-step-title" style="color:var(--text-light); font-weight:400;">A377 → A30 → A392/A3058 into Newquay · approx. 1hr driving</div>
+            <div class="route-step-detail">Back to A377, join A30 at Okehampton direction, then A30/A39 into Cornwall, A392 and A3058 into Newquay.</div>
+          </div>
+        </div>
+
+        <div class="route-step">
+          <div class="route-step-num">🏁</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Arrive: Fistral Rise, Newquay · TR7 1PH</div>
+            <div class="route-step-detail">Check-in from 14:30. Fistral Beach is a 2-min walk. Rick Stein right on the beach — no booking needed.</div>
+            <a href="https://www.google.com/maps/dir/Heywood+Wood+Eggesford+EX18+7BE/Fistral+Rise+Newquay+TR7+1PH" target="_blank" style="display:inline-block; margin-top:8px; background: var(--bark); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 Directions to Newquay</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card bark">
+      <div class="card-header">
+        <div><div class="card-title">Newquay → Brean (connecting trip)</div><div class="card-subtitle">~100 miles · approx. 2–2.5 hours</div></div>
+      </div>
+      <div class="card-body">
+        <div class="route-step">
+          <div class="route-step-num">1</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Depart Newquay by 10:00 on 11 April</div>
+            <div class="route-step-detail">Head northeast via A30 → A39 or A30 → A38 towards Exeter/Somerset.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">2</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Stop: Tiverton / Exeter services (M5, Jct 27 area)</div>
+            <div class="route-step-detail">Short leg stretch for your dog. Tiverton Services has open grassy areas.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">3</div>
+          <div class="route-step-body">
+            <div class="route-step-title">M5 North → Jct 22 (Burnham-on-Sea)</div>
+            <div class="route-step-detail">Leave M5 at Junction 22. Follow signs to Burnham-on-Sea then Brean (B3140).</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">4</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Arrive: Sea Holm, Warren Road, Brean · TA8 2RR</div>
+            <div class="route-step-detail">Arrival from 15:30 on 10 April. Brean Beach is on your doorstep.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /newquay-routes -->
+
+  <!-- PRACTICAL -->
+  <div class="section" id="newquay-practical">
+    <div class="section-title">Practical Info</div>
+    <div class="section-desc">Newquay · 28 March – 11 April 2026</div>
+
+    <div class="card gold" style="margin-bottom:20px;">
+      <div class="card-header">
+        <div><div class="card-title">🏠 Accommodation</div><div class="card-subtitle">Fistral Rise, Atlantic Rise, Fistral Crescent, TR7 1PH</div></div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Check-in</span><span class="detail-val" style="color:var(--grass); font-weight:600;">Saturday 28 March · from 14:30</span></div>
+        <div class="detail-row"><span class="detail-label">Check-out</span><span class="detail-val" style="color:var(--warning); font-weight:600;">Saturday 11 April · by 10:00</span></div>
+        <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-val">14 nights</span></div>
+        <div class="detail-row"><span class="detail-label">Next stop</span><span class="detail-val">Depart by 10:00 on 11 April → drive to Brean (check-in from 15:30 on 10 April)</span></div>
+      </div>
+    </div>
+
+    <div class="practical-grid">
+      <div class="practical-tile">
+        <div class="icon">🏥</div>
+        <div class="p-title">Nearest Vet</div>
+        <div class="p-val">Rosemullion Veterinary Practice</div>
+        <div class="p-sub"><a href="tel:01637872262">01637 872262</a></div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🌊</div>
+        <div class="p-title">Tide Times</div>
+        <div class="p-val"><a href="https://magicseaweed.com" target="_blank">magicseaweed.com</a></div>
+        <div class="p-sub">Check daily for beach safety</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">☎️</div>
+        <div class="p-title">Hemlock Warning Check</div>
+        <div class="p-val"><a href="tel:01637878930">01637 878930</a></div>
+        <div class="p-sub">Newquay Town Council</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🅿️</div>
+        <div class="p-title">Cheaper Parking</div>
+        <div class="p-val">Belmont, Dane Rd, Tower Rd</div>
+        <div class="p-sub">Avoid Fistral car park</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>🌦 Weather</strong>
+      Late March/early April in Cornwall can be changeable. Pack layers, waterproofs, and sun protection. Sea temperature ~9–10°C — cold for swimming, fine for paddling paws.
+    </div>
+
+    <div class="warning-box">
+      <strong>🐾 Cliff Safety</strong>
+      Keep your dog on leads near all cliff edges. The SW Coast Path is spectacular but steep in places. This applies especially on Pentire Headland and Holywell Bay walks.
+    </div>
+
+    <div class="card bark">
+      <div class="card-header"><div class="card-title">Easter Week Impact</div></div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Good Friday</span><span class="detail-val">3 April — Bank Holiday. Confirm restaurant hours in advance.</span></div>
+        <div class="detail-row"><span class="detail-label">Easter Sunday</span><span class="detail-val">5 April — Book Fort Inn & Lewinnick Lodge well ahead. Porth Beach restrictions may begin.</span></div>
+        <div class="detail-row"><span class="detail-label">Easter Monday</span><span class="detail-val">6 April — Newquay will be busier. Book all restaurants for this week.</span></div>
+      </div>
+    </div>
+
+  </div><!-- /newquay-practical -->
+
+</div><!-- /trip-newquay -->
+
+
+<!-- ═══════════════════════════════════════════
+     BREAN
+═══════════════════════════════════════════ -->
+<div class="trip-panel" id="trip-brean">
+
+  <!-- BEACHES -->
+  <div class="section active" id="brean-beaches">
+    <div class="section-title">Beaches</div>
+    <div class="section-desc">10–17 April 2026 · Sea Holm, Warren Road, Brean TA8 2RR</div>
+
+    <div class="warning-box">
+      <strong>⚠️ CRITICAL: Bristol Channel Tidal Hazard</strong>
+      The Bristol Channel has the SECOND HIGHEST tidal range in the world. At low tide, vast mudflats are exposed — <strong>never walk towards the sea at low tide.</strong> The mud traps within seconds and the tide returns fast. Swimming/paddling is ONLY safe ~2 hours either side of high tide. Always check: <a href="https://tidetimes.org.uk/burnham-on-sea-tide-times" target="_blank">tidetimes.org.uk/burnham-on-sea-tide-times</a>
+    </div>
+
+    <div class="tide-callout">
+      <div class="tide-icon">🌊</div>
+      <div class="tide-text">
+        <div class="t-head">Check tides before EVERY beach visit</div>
+        <div class="t-sub">Warden: Brean <a href="tel:07385514540">07385 514540</a> · Berrow <a href="tel:07385038947">07385 038947</a></div>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Brean Beach</div>
+          <div class="card-subtitle">2-min drive · On your doorstep</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Sandy, 7 miles long</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">No restrictions all year</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">£3–5 on beach (summer hours from Easter: daily 10am–6pm)</span></div>
+        <div class="detail-row"><span class="detail-label">⚠️ Tides</span><span class="detail-val">Check before every visit. Strict 15mph limit. Never drive on mudflats.</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead, no restrictions</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Berrow Beach</div>
+          <div class="card-subtitle">5-min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Sandy with dunes</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">No restrictions all year</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">£3.50–5 or free at Berrow nature reserve</span></div>
+        <div class="detail-row"><span class="detail-label">Highlight</span><span class="detail-val">SS Nornen 1897 shipwreck visible at low/mid tide. Only approach when tide is going OUT on hard sand. Never on mudflats.</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead, no restrictions</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Brean Down Beach</div>
+          <div class="card-subtitle">5-min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Sheltered sandy cove</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">All year, off lead on sand</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">NT £6 (free for members)</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Mud at low tide. Dogs MUST be on lead on the Down (cliffs, nesting birds, livestock).</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead on sand · On lead on the Down</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Burnham-on-Sea Beach</div>
+          <div class="card-subtitle">10-min drive</div>
+        </div>
+        <span class="badge badge-gold">Part Access</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">In April</span><span class="detail-val">Areas 2 & 3: Dogs OK. Area 1 (Jetty to Pavilion): BANNED ALL YEAR.</span></div>
+        <div class="detail-row"><span class="detail-label">From 1 May</span><span class="detail-val">Seasonal ban begins — not relevant to your trip</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">Free esplanade parking</span></div>
+        <span class="policy-pill policy-lead">⚠️ Avoid Area 1 (Jetty–Pavilion) at all times</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Sand Bay (Weston-super-Mare)</div>
+          <div class="card-subtitle">25-min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Sandy, dune-backed — a quiet gem</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">No restrictions all year</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">Free</span></div>
+        <div class="detail-row"><span class="detail-label">Highlight</span><span class="detail-val">Sand Point headland walk. Dogs welcome on Weston main beach in April.</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead, no restrictions</span>
+      </div>
+    </div>
+
+  </div><!-- /brean-beaches -->
+
+  <!-- PUBS -->
+  <div class="section" id="brean-pubs">
+    <div class="section-title">Pubs & Restaurants</div>
+    <div class="section-desc">All dog-friendly · Brean, Burnham & surrounds</div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Brean Down Inn</div>
+          <div class="card-subtitle">100m from Brean Beach · Warren Road, Brean TA8 2RR</div>
+        </div>
+        <span class="badge badge-green">Dogs Inside</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Daily ~11am–11pm, food all day. Tuesdays may be pizza-only — call to confirm.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs welcome throughout (bar, conservatory, outdoor). Water bowls at bar. Treats offered.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Walk-ins welcome. Call for groups: <a href="tel:01278751420">01278 751420</a></span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Burgers, pizzas, curries, gammon, fish & chips. Real ales (Butcombe, Glastonbury Brewing).</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Your nearest pub — your go-to for easy evenings. Good portions, reasonable prices.</span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Dunstan House Inn ⭐</div>
+          <div class="card-subtitle">10-min drive · 8–10 Love Lane, Burnham-on-Sea TA8 1EU</div>
+        </div>
+        <span class="badge badge-green">Dogs Inside</span>
+      </div>
+      <div class="card-body">
+        <div class="warning-box" style="background: var(--gold-pale); border-color: rgba(201,150,58,0.3); color: var(--bark); margin-bottom: 10px;">
+          <strong>⭐ THE standout dining option in Burnham</strong>
+          Book ahead — essential for Sunday roasts.
+        </div>
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Mon–Thu 11–23 · Fri–Sat 11–00 · Sun 12–22:30. Food: Mon–Fri 12–15 & 17–21, Sat 12–21, Sun 12–20</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs welcome throughout. Water bowls provided.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val"><a href="https://www.dunstanhouseinn.co.uk/food-drink/" target="_blank">dunstanhouseinn.co.uk</a> — essential for Sunday roasts</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Cyder-battered haddock, Dunstan burger, sharing boards, West Country Sunday roasts with giant Yorkshires.</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Burnham's best beer garden with stretch tent & outside bar. Beautiful Young's pub, heart of town.</span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Brent Knoll Inn</div>
+          <div class="card-subtitle">10-min drive · Brent Road, East Brent TA9 4JG</div>
+        </div>
+        <span class="badge badge-green">Dogs + Dog!</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Mon–Fri 12–15 & 18–23 · Sat 12–15 & 17–23 · Sun 12–23 (no food Sun eve)</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs in bar area and garden. Water bowls. They have a pub dog!</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Book Sunday lunch: <a href="tel:01278760335">01278 760335</a>. Walk-ins other times.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Meat from Hecter's Farm Shop, Wedmore. Home-cooked Sunday roasts (2 meats, under £13). Real ales.</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Perfect post-Brent Knoll hillfort walk pub. Beer garden with Knoll views.</span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Brean Down Café</div>
+          <div class="card-subtitle">5-min drive · Base of Brean Down, nr NT car park TA8 2RS</div>
+        </div>
+        <span class="badge badge-green">Dogs Inside</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Daily ~9/10am–16:00 (seasonal, may close earlier in bad weather)</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs welcome INSIDE (downstairs). Doggy breakfast and Marshfield's dog ice cream on menu!</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Breakfasts, light lunches, cakes, hot drinks. Second-hand bookshop upstairs (no dogs up there).</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Quirky post-walk warm-up spot. NT Cove Café next door is takeaway only, dogs outside.</span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Railway</div>
+          <div class="card-subtitle">10-min drive · College Street, Burnham-on-Sea TA8 1AS</div>
+        </div>
+        <span class="badge badge-green">Dogs Inside</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Daily 11am–midnight, food all day</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Fish & chips, hunter's chicken, burgers, all-day breakfast. 2-for-1 deals. Live sport. Budget-friendly.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Greene King app or walk in. <a href="tel:01278784782">01278 784782</a></span></div>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Lamb Inn, Axbridge</div>
+          <div class="card-subtitle">20-min drive · The Square, Axbridge BS26 2AP</div>
+        </div>
+        <span class="badge badge-green">Dogs Inside</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Typically daily from 12 noon. <a href="https://www.thelambaxbridge.co.uk/" target="_blank">thelambaxbridge.co.uk</a></span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs inside and in beer garden.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Advisable for meals, especially weekends. <a href="tel:01934732253">01934 732253</a></span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Pub classics, seasonal dishes, Butcombe beer, local ciders. Beautiful 1480 coaching inn.</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Perfect combined with Strawberry Line or Cheddar day trip. Free town parking.</span></div>
+      </div>
+    </div>
+
+  </div><!-- /brean-pubs -->
+
+  <!-- WALKS -->
+  <div class="section" id="brean-walks">
+    <div class="section-title">Walks</div>
+    <div class="section-desc">Brean & surrounds · Always check tide times</div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Brean Down Circular ⭐</div>
+          <div class="card-subtitle">NT car park, Brean Down Cove TA8 2RS · 3 miles · Moderate</div>
+        </div>
+        <span class="badge badge-grey">5-min drive</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">1.5–2 hours</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">ON LEAD at all times on the Down (steep cliffs, nesting birds Mar–Jul, livestock). Off lead on beach.</span></div>
+        <p>Somerset's 'natural pier' — a limestone peninsula extending 1.5 miles into the Bristol Channel, rising 97m. Climb 200 steps (or gentler military road) to the ridge, walk to the Palmerston Fort at the tip. Return via the lower southern path past a Romano-Celtic temple and Iron Age hillfort. Views to Wales, Steep Holm, and the Somerset Levels. Wild goats, peregrine falcons and skylarks.</p>
+        <p style="margin-top:8px;"><strong>Refreshments:</strong> Brean Down Café (dogs inside, doggy breakfast & ice cream) or NT Cove Café (dogs outside, covered seating). Both at car park.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.nationaltrust.org.uk/visit/somerset/brean-down/brean-down-coastal-walk" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 National Trust Walk</a>
+          <a href="https://www.nationaltrail.co.uk/en_GB/short-routes/brean-down-circular/" target="_blank" style="display:inline-block; background: var(--sea); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 National Trail Map</a>
+        </div>
+          <div class="card-subtitle">From accommodation · 4–7 miles flexible · Easy</div>
+        </div>
+        <span class="badge badge-green">From door</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">2–3.5 hours</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead. Keep under control near horses.</span></div>
+        <div class="detail-row"><span class="detail-label">⚠️ Tides</span><span class="detail-val">Only approach the shipwreck when tide is going OUT on hard sand. Never onto mudflats.</span></div>
+        <p>Walk the magnificent 7-mile beach northwards. At ~3 miles find the 1897 Norwegian barque SS Nornen wreck, visible at low/mid tide. Continue to Berrow Dunes Nature Reserve for a loop through rare sand dune habitat with 270+ plant species, ponds, and atmospheric 13th-century St Mary's Church.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.nationaltrail.co.uk/en_GB/short-routes/berrow-storywalk/" target="_blank" style="display:inline-block; background: var(--sea); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 National Trail — Nornen Walk</a>
+          <a href="https://www.alltrails.com/en-gb/trail/england/somerset/berrow-beach-walk" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 AllTrails Map</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Brent Knoll Iron Age Hillfort</div>
+          <div class="card-subtitle">St Michael's Church, Brent Knoll village · 3 miles circular · Moderate</div>
+        </div>
+        <span class="badge badge-grey">10-min drive</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">1.5–2 hours</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead generally. Farm animals behind fences. Watch for livestock at summit.</span></div>
+        <p>The distinctive flat-topped hill visible from the M5, rising 400ft from the Somerset Levels. Well-maintained path to Iron Age hillfort at the summit. Extraordinary 360° panorama — Glastonbury Tor, Wales, the coast. A highlight of your stay.</p>
+        <p style="margin-top:8px;"><strong>Refreshments:</strong> Brent Knoll Inn (dog-friendly, 5-min walk) or Red Cow pub.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.alltrails.com/en-gb/trail/england/somerset/brent-knoll-circular" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 AllTrails Map</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Berrow Dunes Nature Reserve Loop</div>
+          <div class="card-subtitle">Berrow Dunes car park opp Sandy Glade TA8 2AX · 2–3 miles · Easy</div>
+        </div>
+        <span class="badge badge-grey">5-min drive</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">1–1.5 hours</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Under control on paths (ground-nesting birds, rare orchids).</span></div>
+        <p>Somerset's only sand dune SSSI. Waymarked paths through dunes, ponds, scrub and woodland. Emerge onto Berrow Beach. WWII pillbox being consumed by sand. Rare lizard orchids in season.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.nationaltrail.co.uk/en_GB/short-routes/berrow-storywalk/" target="_blank" style="display:inline-block; background: var(--sea); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 National Trail Map</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Cheddar Gorge Cliff-Top Circular</div>
+          <div class="card-subtitle">NT shop, Cheddar Gorge BS27 3QF · 4 miles · Moderate–Hard</div>
+        </div>
+        <span class="badge badge-grey">20-min drive</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">2–3 hours</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">On lead (cliff edges). NT confirms dog-friendly.</span></div>
+        <p>England's largest gorge — 400ft deep, 3 miles long. Cliff-top paths with dramatic views into the gorge. Peregrine falcons, Soay sheep, rare Cheddar Pink. Steps, rocky terrain, can be muddy. Spectacular.</p>
+        <p style="margin-top:8px;"><strong>Refreshments:</strong> White Hart, Cheddar (dog-friendly, BS27 3QN) or Lamb Inn, Axbridge.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.alltrails.com/en-gb/trail/england/somerset/cheddar-gorge-circular" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 AllTrails Map</a>
+          <a href="https://www.nationaltrust.org.uk/visit/somerset/cheddar-gorge/walking-at-cheddar-gorge" target="_blank" style="display:inline-block; background: var(--sea); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 National Trust Walk</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Strawberry Line (Cheddar–Axbridge)</div>
+          <div class="card-subtitle">Cheddar BS27 3QF or Axbridge · up to 10 miles · Easy flat</div>
+        </div>
+        <span class="badge badge-grey">20-min drive</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">Flexible (3-mile section: ~1.5 hrs)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">On lead recommended (shared with cyclists).</span></div>
+        <p>Former railway converted to a limestone path. Flat and accessible through orchards, wetlands and villages. The Cheddar–Axbridge section includes a 165m railway tunnel. Combine with Cheddar Reservoir loop (1.5 miles).</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <a href="https://www.strawberryline.org.uk/route-map/" target="_blank" style="display:inline-block; background: var(--grass); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: none;">🗺 Strawberry Line Route Map</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /brean-walks -->
+
+  <!-- ROUTE -->
+  <div class="section" id="brean-routes">
+    <div class="section-title">Driving Route</div>
+    <div class="section-desc">Newquay → Brean with dog-friendly stops</div>
+
+    <div class="info-box">
+      <strong>🚗 Newquay → Brean · ~100 miles · approx. 2–2.5 hours driving</strong>
+      Depart Newquay by 10:00 on 11 April. Route: A30 → A39/A38 → M5 North → Jct 22. Arrival at Sea Holm from 15:30.
+    </div>
+
+    <div class="card bark">
+      <div class="card-header">
+        <div><div class="card-title">Newquay → Brean</div><div class="card-subtitle">11 April 2026 · Depart by 10:00</div></div>
+      </div>
+      <div class="card-body">
+        <div class="route-step">
+          <div class="route-step-num">1</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Depart Fistral Rise by 10:00</div>
+            <div class="route-step-detail">Head east on A3058 → A392 → A30 heading northeast towards Bodmin.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">2</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Stop 1: Bodmin Moor area · ~40 min from Newquay</div>
+            <div class="route-step-detail">Open moorland access just off the A30. Perfect for an off-lead run before the motorway stretch. Jamaica Inn at Bolventor is dog-friendly inside.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">3</div>
+          <div class="route-step-body">
+            <div class="route-step-title">A30 → A38 → M5 North</div>
+            <div class="route-step-detail">Cross into Devon at Launceston. Join M5 at Exeter. Head north through Somerset.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">4</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Stop 2: Taunton Deane Services (M5, Jct 25 area) · ~1.5 hrs</div>
+            <div class="route-step-detail">Grass areas and walk space. Toilets, food, Costa. Good midpoint break.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">5</div>
+          <div class="route-step-body">
+            <div class="route-step-title">M5 → Jct 22 (Burnham-on-Sea)</div>
+            <div class="route-step-detail">Leave motorway at Junction 22. Follow B3140 signs to Burnham-on-Sea then Brean.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">6</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Arrive: Sea Holm, Warren Road, Brean TA8 2RR</div>
+            <div class="route-step-detail">Check-in from 15:30. The Brean Down Inn is 100m away. Brean Beach is on your doorstep.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bark">
+      <div class="card-header">
+        <div><div class="card-title">Brean → Home (Departure)</div><div class="card-subtitle">17 April 2026 · Depart morning</div></div>
+      </div>
+      <div class="card-body">
+        <div class="route-step">
+          <div class="route-step-num">1</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Early beach walk before packing up</div>
+            <div class="route-step-detail">One last sunrise walk on Brean Beach before loading the car.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">2</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Depart Sea Holm on 17 April</div>
+            <div class="route-step-detail">Take B3140 to Burnham-on-Sea → A38 → M5 South (if heading towards London) or route as needed.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">3</div>
+          <div class="route-step-body">
+            <div class="route-step-title">M5 South → M4 East → M25 → Home</div>
+            <div class="route-step-detail">Standard route home. Allow a stop at Gordano Services (M5, Jct 19 near Bristol) — good dog walk area and facilities.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /brean-routes -->
+
+  <!-- PRACTICAL -->
+  <div class="section" id="brean-practical">
+    <div class="section-title">Practical Info</div>
+    <div class="section-desc">Brean & Burnham-on-Sea · 10–17 April 2026</div>
+
+    <div class="card gold" style="margin-bottom:20px;">
+      <div class="card-header">
+        <div><div class="card-title">🏠 Accommodation</div><div class="card-subtitle">Sea Holm, Warren Road, Brean, Somerset TA8 2RR</div></div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Check-in</span><span class="detail-val" style="color:var(--grass); font-weight:600;">Thursday 10 April · from 15:30</span></div>
+        <div class="detail-row"><span class="detail-label">Check-out</span><span class="detail-val" style="color:var(--warning); font-weight:600;">Friday 17 April · morning</span></div>
+        <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-val">7 nights</span></div>
+        <div class="detail-row"><span class="detail-label">Previous leg</span><span class="detail-val">Arriving from Newquay (depart TR7 1PH by 10:00 on 11 April)</span></div>
+      </div>
+    </div>
+
+    <div class="tide-callout">
+      <div class="tide-icon">🌊</div>
+      <div class="tide-text">
+        <div class="t-head">Check tide times before EVERY beach visit</div>
+        <div class="t-sub"><a href="https://tidetimes.org.uk/burnham-on-sea-tide-times" target="_blank">tidetimes.org.uk/burnham-on-sea-tide-times</a> · Safe swimming: ~2 hrs either side of high tide only</div>
+      </div>
+    </div>
+
+    <div class="practical-grid">
+      <div class="practical-tile">
+        <div class="icon">🏥</div>
+        <div class="p-title">Nearest Vet</div>
+        <div class="p-val">Quantock Veterinary Hospital</div>
+        <div class="p-sub">3 College Street, Burnham-on-Sea TA8 1AE<br><a href="https://quantockvets.co.uk" target="_blank">quantockvets.co.uk</a></div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🏖</div>
+        <div class="p-title">Brean Beach Warden</div>
+        <div class="p-val"><a href="tel:07385514540">07385 514540</a></div>
+        <div class="p-sub">Beach hours from Easter: 10am–6pm daily</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🏖</div>
+        <div class="p-title">Berrow Beach Warden</div>
+        <div class="p-val"><a href="tel:07385038947">07385 038947</a></div>
+        <div class="p-sub">Open daily 10am–6pm (summer hours from Easter)</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🌊</div>
+        <div class="p-title">Tide Times</div>
+        <div class="p-val"><a href="https://tidetimes.org.uk/burnham-on-sea-tide-times" target="_blank">tidetimes.org.uk</a></div>
+        <div class="p-sub">Check every single day — critical here</div>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <strong>🚗 Driving on Brean Beach</strong>
+      Strict 15mph limit enforced. NEVER drive on mudflats — you will get stuck and recovery is extremely expensive. If in doubt, stay on the hard sand track.
+    </div>
+
+    <div class="card bark">
+      <div class="card-header"><div class="card-title">Suggested 7-Day Plan</div></div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Fri 10 Apr</span><span class="detail-val">Arrive 15:30. Evening stroll on Brean Beach. Dinner at Brean Down Inn.</span></div>
+        <div class="detail-row"><span class="detail-label">Sat 11 Apr</span><span class="detail-val">Brean Down circular walk (1.5–2 hrs). Coffee at Brean Down Café. Beach afternoon. Dunstan House Inn evening (book ahead).</span></div>
+        <div class="detail-row"><span class="detail-label">Sun 12 Apr</span><span class="detail-val">Brent Knoll hillfort (1.5–2 hrs). Sunday lunch at Brent Knoll Inn (book, 12–4pm). Gentle beach afternoon.</span></div>
+        <div class="detail-row"><span class="detail-label">Mon 13 Apr</span><span class="detail-val">Check tide times. Walk to SS Nornen shipwreck and Berrow Dunes. Lunch in Burnham (Railway or Dunstan House).</span></div>
+        <div class="detail-row"><span class="detail-label">Tue 14 Apr</span><span class="detail-val">Cheddar day trip. Gorge cliff-top walk (2–3 hrs) or Strawberry Line. Lunch at Lamb Inn, Axbridge.</span></div>
+        <div class="detail-row"><span class="detail-label">Wed 15 Apr</span><span class="detail-val">Sand Bay / Weston. Beach walk and Sand Point headland. Dogs welcome on Weston main beach in April.</span></div>
+        <div class="detail-row"><span class="detail-label">Thu 16 Apr</span><span class="detail-val">Favourite revisit. Final dinner at Dunstan House Inn.</span></div>
+        <div class="detail-row"><span class="detail-label">Fri 17 Apr</span><span class="detail-val">Early beach walk. Pack up and depart.</span></div>
+      </div>
+    </div>
+
+  </div><!-- /brean-practical -->
+
+</div><!-- /trip-brean -->
+
+<!-- ═══════════════════════════════════════════
+     DEVON — 3 GABBERWELL COTTAGES, KINGSTON
+═══════════════════════════════════════════ -->
+<div class="trip-panel" id="trip-devon">
+
+  <!-- BEACHES -->
+  <div class="section active" id="devon-beaches">
+    <div class="section-title">Beaches</div>
+    <div class="section-desc">17 – 24 April 2026 · 3 Gabberwell Cottages, Kingston, TQ7 4PS</div>
+
+    <div class="warning-box">
+      <strong>⚠️ Important — Bantham Beach dog restriction begins 1 May</strong>
+      Your stay (17–24 April) is just before the main beach ban kicks in. Dogs are banned from the main Bantham beach from 1 May to 30 September. You are fine for your entire stay, but <strong>do not return after 1 May</strong>. The estuary side of Bantham is dog-friendly all year round.
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Bantham Beach</div>
+          <div class="card-subtitle">~5 min drive · near Bigbury-on-Sea</div>
+        </div>
+        <span class="badge badge-green">Apr: All OK</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Vast fine sand; rock pools at south end. Estuary inlet on the north side.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Main beach: dogs OK until 30 April. Ban 1 May–30 Sep. Estuary side: all year.</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">Large car park (charged ~£6). Very narrow lanes on final mile — drive carefully.</span></div>
+        <div class="detail-row"><span class="detail-label">Facilities</span><span class="detail-val">Gastrobus, Bantham Stores & Café, toilets, lifeguards (April–Oct), surf hire.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Strong undercurrents — don't swim near river mouth. Premier South Devon surf beach.</span></div>
+        <span class="policy-pill policy-all-year">🐾 Off lead (main beach) until 30 April</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Ayrmer Cove</div>
+          <div class="card-subtitle">~10 min drive · near Ringmore</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Sand and pebbles, dramatic rock formations, clear water. Sheltered cove.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">All year, no restrictions.</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">National Trust car park near Ringmore (TQ7 4HR). ~15 min walk to beach via steep path.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Hidden South Hams gem. Rock pools at low tide. Steep path down — worth it for the peace.</span></div>
+        <span class="policy-pill policy-all-year">🐾 All year, off lead</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Wonwell Beach / Erme Estuary</div>
+          <div class="card-subtitle">~10 min drive · near Kingston</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Sandy estuary beach at mouth of River Erme. Submerged prehistoric forest visible at low tide.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">All year, no restrictions.</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">Roadside near Wonwell — follow lane from Kingston toward the coast.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Starting point for the classic Kingston–Wonwell–Westcombe walk. River crossing to Mothecombe possible within 1 hour of low tide only.</span></div>
+        <span class="policy-pill policy-all-year">🐾 All year, off lead</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">South Milton Sands & Thurlestone Beach</div>
+          <div class="card-subtitle">~15 min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Sandy, dune-backed. Famous Thurlestone Rock arch offshore. Shallow, gradual shelving.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">All year, no restrictions. Marine Conservation award-winning water.</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">NT car park South Milton (TQ7 3JY) or Thurlestone car park (TQ7 3JS). Pay & display.</span></div>
+        <div class="detail-row"><span class="detail-label">Facilities</span><span class="detail-val">Beach café, toilets, kayak/paddleboard hire. Rock pools at low tide.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Walk connects to Bantham via coastal path (~3 miles).</span></div>
+        <span class="policy-pill policy-all-year">🐾 All year, off lead</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Slapton Sands & Torcross Beach</div>
+          <div class="card-subtitle">~20 min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">3-mile shingle/fine sand barrier beach backed by Slapton Ley freshwater nature reserve.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">All year, no restrictions. Dogs also welcome in the adjacent Slapton Ley nature reserve.</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">Torcross car park (TQ7 2TQ) or Slapton Memorial car park (A379, TQ7 2TQ). Pay & display.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">WWII D-Day rehearsal site. Sherman tank monument at Torcross. Long flat walk, great for dogs.</span></div>
+        <span class="policy-pill policy-all-year">🐾 All year, off lead</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Beesands Beach</div>
+          <div class="card-subtitle">~20 min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Long pebble beach looking over Start Bay. Unspoilt, backed by fields and freshwater lake.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">All year, no restrictions.</span></div>
+        <div class="detail-row"><span class="detail-label">Parking</span><span class="detail-val">Free parking right by the beach.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Dog-friendly Britannia Beach Café for a post-walk cream tea or catch-of-the-day lunch.</span></div>
+        <span class="policy-pill policy-all-year">🐾 All year, off lead</span>
+      </div>
+    </div>
+
+  </div><!-- /devon-beaches -->
+
+  <!-- PUBS -->
+  <div class="section" id="devon-pubs">
+    <div class="section-title">Pubs & Food</div>
+    <div class="section-desc">Dog-friendly dining in the South Hams</div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Sloop Inn, Bantham</div>
+          <div class="card-subtitle">The Standout — 14th-century inn, steps from the beach</div>
+        </div>
+        <span class="badge badge-green">Dogs Throughout</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">Bantham, Kingsbridge, TQ7 3AN</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">01548 560489</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Children and dogs welcome THROUGHOUT the inn — all areas.</span></div>
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Open all day in season. Kitchen: lunch & dinner daily (check thesloop.co.uk for exact times).</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Pub classics, local seafood, seasonal specials — all locally sourced, menu changes daily. Sunday roasts highly praised. St Austell ales.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Essential — very popular, book via thesloop.co.uk or call ahead.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Bar built from a small boat's hull. Short walk from Bantham surf beach. THE pub of your stay.</span></div>
+        <a href="https://www.thesloop.co.uk" target="_blank" class="map-btn">🌐 thesloop.co.uk</a>
+      </div>
+    </div>
+
+    <div class="card bark">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Dolphin Inn, Kingston</div>
+          <div class="card-subtitle">Your village local — 16th-century, 2 min walk</div>
+        </div>
+        <span class="badge badge-green">Dogs Welcome</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">Kingston, Kingsbridge, TQ7 4QE (next to the church)</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">01548 810314</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dogs welcome throughout. Children and dogs both fine. Beer garden and indoor seating.</span></div>
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Mon–Sun: 11:00–23:00. Food not served every day — phone ahead to confirm.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Home-cooked local produce — fish pie, steak & ale pie, Sunday roasts. Sticky toffee pudding not to be missed. Inglenook fireplace. Beer garden.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Book for Sunday lunch: 01548 810314. Walk-ins welcome other times.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">2.5-hour circular walk from the pub door through woodland, estuary, coast path and farmland. Live music weekends. CAMRA local.</span></div>
+        <a href="https://www.the-dolphin-inn-kingston.co.uk" target="_blank" class="map-btn">🌐 the-dolphin-inn-kingston.co.uk</a>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Cricket Inn, Beesands</div>
+          <div class="card-subtitle">Beachside pub with catch-of-the-day</div>
+        </div>
+        <span class="badge badge-green">Dogs Welcome</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">Beesands, Kingsbridge, TQ7 2EN</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">01548 580215</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dog-friendly throughout. Water bowls provided.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Exceptional fresh seafood — local day-boat fish, crab from Slapton, Brixham catch. Homemade pies, Devon cream teas. Own fishing boat.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Advisable for meals — call or check website.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Right on the beach overlooking Start Bay. Perfect post-Beesands or Slapton walk.</span></div>
+        <a href="https://www.thecricketinn.co.uk" target="_blank" class="map-btn">🌐 thecricketinn.co.uk</a>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Crabshell Inn, Kingsbridge</div>
+          <div class="card-subtitle">Waterfront quayside spot</div>
+        </div>
+        <span class="badge badge-green">Dogs Welcome</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">Embankment Road, Kingsbridge, TQ7 1JZ</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">01548 852345</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dog-friendly. Quayside location — popular with dog walkers.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Fresh seafood, pub classics, seasonal specials. Great views over Kingsbridge Estuary. Mooring available for arriving by boat.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Good base for a market town browse — Kingsbridge has excellent independent shops.</span></div>
+        <a href="https://www.crabshellkingsbridge.co.uk" target="_blank" class="map-btn">🌐 crabshellkingsbridge.co.uk</a>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Oyster Shack, Bigbury</div>
+          <div class="card-subtitle">Quirky seafood gem near Bigbury Beach</div>
+        </div>
+        <span class="badge badge-green">Dogs Welcome</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">Stakes Hill, Bigbury, TQ7 4BE</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">01548 810876</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dog-friendly inside and out. Informal, relaxed atmosphere.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Oysters, mussels, daily catch menu plus non-fish options. Great cocktails. Indoor and outdoor seating with views to Burgh Island.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Booking strongly advisable — very popular. Check oystershack.co.uk.</span></div>
+        <a href="https://www.oystershack.co.uk" target="_blank" class="map-btn">🌐 oystershack.co.uk</a>
+      </div>
+    </div>
+
+  </div><!-- /devon-pubs -->
+
+  <!-- WALKS -->
+  <div class="section" id="devon-walks">
+    <div class="section-title">Walks</div>
+    <div class="section-desc">South Hams & South West Coast Path</div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">1. Kingston to Wonwell & Westcombe Circular</div>
+          <div class="card-subtitle">3 miles · 1.5–2 hrs · Moderate · From your door</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">The Dolphin Inn, Kingston, TQ7 4QE (0 min drive)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead generally — on lead past farm animals.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">From the Dolphin, walk past the church and take the bridleway through Furzedown Wood down to Wonwell Beach on the Erme Estuary. Return via coast path through Westcombe Beach and back up the valley to Kingston.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Ancient oak woodland carpeted with bluebells & wild garlic in April. Quiet estuary beach. Dramatic clifftop views. Ravens, oystercatchers, cirl buntings.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">The river Erme can be forded to Mothecombe within 1 hour of low tide only — do not attempt otherwise.</span></div>
+        <a href="https://www.southwestcoastpath.org.uk/walksdb/94/" target="_blank" class="map-btn">🗺 Official Route (SW Coast Path)</a>
+        <a href="https://www.alltrails.com/explore/england/devon?near=kingston-devon" target="_blank" class="map-btn">📍 AllTrails nearby</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">2. Bantham to Bigbury via Burgh Island Circular</div>
+          <div class="card-subtitle">5–6 miles · 2.5–3 hrs · Moderate · From Bantham</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Bantham car park, TQ7 3AN (~5 min drive)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead on beach. On lead on Burgh Island if visiting.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">Walk the beach then follow the South West Coast Path east, crossing the tidal causeway to Burgh Island (or sea tractor at high tide). Loop around the island for views then continue to Bigbury-on-Sea. Return via coastal path or inland via Ringmore village.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Iconic Burgh Island with its Art Deco hotel. Panoramic Bigbury Bay views. Rock pools. The estuary crossing is an experience in itself.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Burgh Island causeway only passable at low tide — plan with tide times. Sea tractor runs at high tide (small charge).</span></div>
+        <a href="https://www.southwestcoastpath.org.uk/" target="_blank" class="map-btn">🗺 SW Coast Path</a>
+        <a href="https://www.alltrails.com/explore/england/devon" target="_blank" class="map-btn">📍 AllTrails</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">3. Bigbury to Erme Mouth via Ringmore Circular</div>
+          <div class="card-subtitle">7 miles · 3–3.5 hrs · Moderate · Classic SWCP loop</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Bigbury-on-Sea main car park (TQ7 4AS, ~10 min drive)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead on beach. On lead through village and near livestock.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">From Bigbury car park follow inland to Kingston and Ringmore village, then descend through Furzedown Wood to the Erme Estuary at Wonwell. Rejoin coast path along dramatic cliffs past Ayrmer Cove, Challaborough, back to Bigbury.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Rolling South Hams countryside, thatched villages, wooded estuary, hidden coves, clifftop drama. Some of the most varied walking in South Devon.</span></div>
+        <a href="https://www.walkingbritain.co.uk/walk-1975-description" target="_blank" class="map-btn">🗺 Full walk description</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">4. Bantham & Avon Estuary Circular (via Thurlestone)</div>
+          <div class="card-subtitle">4 miles · 2 hrs · Easy–Moderate</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Bantham car park, TQ7 3AN</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead on estuary path. Under control near livestock.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">From Bantham beach, follow the Avon Estuary Way north through estuary-side woodland and Stiddicombe Creek. Return via Thurlestone village and the clifftop coast path back to Bantham. Bluebells in the woodland in April.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Ancient oak woodland; shelduck, egrets and swans on the estuary; Thurlestone Rock; limestone limekiln; thatched Thurlestone village.</span></div>
+        <a href="https://www.southwestcoastpath.org.uk/walksdb/703/" target="_blank" class="map-btn">🗺 Official Route (SW Coast Path)</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">5. Slapton Ley Nature Reserve</div>
+          <div class="card-subtitle">3–4 miles · 1.5–2 hrs · Easy · Flat</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Torcross car park (TQ7 2TQ, ~20 min drive)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">On lead near reed beds to protect ground-nesting birds. Off lead on beach.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">Walk the shingle beach alongside Slapton Ley — the largest freshwater lake in south-west England. Birdwatcher's paradise. Loop via the reserve path back.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Reed warblers, otters, kingfishers. WWII Sherman tank memorial at Torcross. Views across Start Bay.</span></div>
+        <a href="https://www.alltrails.com/explore/england/devon/slapton" target="_blank" class="map-btn">📍 AllTrails</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">6. Start Point & Prawle Point Coastal Loop</div>
+          <div class="card-subtitle">5 miles · 2.5 hrs · Moderate · Devon's most southerly point</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Start Point car park (TQ7 2ET, ~25 min drive)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">On lead near cliff edges and lighthouse. Off lead on open path.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">Walk the SWCP from Start Point south to Prawle Point — the most southerly point in Devon. Return via inland field paths. Dramatic rugged cliffs, hidden coves, cirl buntings and peregrine falcons.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Start Point lighthouse. Views to Eddystone Lighthouse on clear days. Some of the most dramatic coastal scenery in Devon.</span></div>
+        <a href="https://www.southwestcoastpath.org.uk/" target="_blank" class="map-btn">🗺 SW Coast Path</a>
+      </div>
+    </div>
+
+  </div><!-- /devon-walks -->
+
+  <!-- ROUTES -->
+  <div class="section" id="devon-routes">
+    <div class="section-title">Route</div>
+    <div class="section-desc">Driving route to be added by Lana</div>
+    <div class="card bark">
+      <div class="card-body">
+        <p style="color:var(--text-mid); font-size:0.88rem; padding: 12px 0;">Route details to be provided. Accommodation: <strong>3 Gabberwell Cottages, Kingston, Kingsbridge, Devon, TQ7 4PS</strong>. Arrival from <strong>16:00 on 17 April</strong>. Departure by <strong>10:00 on 24 April</strong>.</p>
+      </div>
+    </div>
+  </div><!-- /devon-routes -->
+
+  <!-- PRACTICAL -->
+  <div class="section" id="devon-practical">
+    <div class="section-title">Practical</div>
+    <div class="section-desc">Essential info for the Devon leg</div>
+
+    <div class="card gold">
+      <div class="card-header"><div><div class="card-title">🏠 Accommodation</div></div></div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Property</span><span class="detail-val">3 Gabberwell Cottages</span></div>
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">Kingston, Kingsbridge, Devon, TQ7 4PS</span></div>
+        <div class="detail-row"><span class="detail-label">Arrival</span><span class="detail-val">Thursday 17 April 2026 from 16:00</span></div>
+        <div class="detail-row"><span class="detail-label">Departure</span><span class="detail-val">Friday 24 April 2026 before 10:00</span></div>
+        <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-val">7 nights</span></div>
+        <div class="detail-row"><span class="detail-label">Booking ref</span><span class="detail-val">3933553 · holidaycottages.co.uk</span></div>
+        <div class="detail-row"><span class="detail-label">Next leg</span><span class="detail-val">Mermaid's Cave, Whitstable · 24 April from 16:00</span></div>
+      </div>
+    </div>
+
+    <div class="practical-grid">
+      <div class="practical-tile">
+        <div class="icon">🏥</div>
+        <div class="p-title">Nearest Vet</div>
+        <div class="p-val">Quantock Veterinary Group, Kingsbridge</div>
+        <div class="p-sub">Fore Street, Kingsbridge TQ7 1AB · 01548 852177</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🌊</div>
+        <div class="p-title">Tide Times</div>
+        <div class="p-val"><a href="https://www.tidetimes.org.uk/bigbury-on-sea-tide-times" target="_blank">tidetimes.org.uk</a></div>
+        <div class="p-sub">Check before Bantham & Wonwell visits. Erme ford = 1hr either side of low tide only.</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🚨</div>
+        <div class="p-title">Key Date</div>
+        <div class="p-val">1 May = Bantham dog ban</div>
+        <div class="p-sub">Main beach closes to dogs from 1 May. You depart 24 April — you're fine.</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🛒</div>
+        <div class="p-title">Farm Shop</div>
+        <div class="p-val">Stokeley Farm Shop</div>
+        <div class="p-sub">Stokenham, TQ7 2SE · 01548 581010 · Excellent local produce, café, deli.</div>
+      </div>
+    </div>
+
+    <div class="card bark">
+      <div class="card-header"><div><div class="card-title">📅 Suggested 7-Day Plan</div></div></div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Thu 17 Apr</span><span class="detail-val">Arrive from 16:00. Evening stroll from Kingston village to Wonwell estuary. Dinner at The Dolphin Inn.</span></div>
+        <div class="detail-row"><span class="detail-label">Fri 18 Apr</span><span class="detail-val">Bantham Beach morning (tide-check first). Explore Burgh Island on foot at low tide. Lunch at The Sloop Inn (book ahead).</span></div>
+        <div class="detail-row"><span class="detail-label">Sat 19 Apr</span><span class="detail-val">Kingston–Wonwell–Westcombe circular from the door. Afternoon at Ayrmer Cove. Evening at The Dolphin.</span></div>
+        <div class="detail-row"><span class="detail-label">Sun 20 Apr</span><span class="detail-val">Bantham & Avon Estuary walk. Sunday lunch at The Sloop Inn (book essential). Lazy afternoon.</span></div>
+        <div class="detail-row"><span class="detail-label">Mon 21 Apr</span><span class="detail-val">South Milton Sands & Thurlestone beach morning. Oyster Shack lunch near Bigbury (book ahead).</span></div>
+        <div class="detail-row"><span class="detail-label">Tue 22 Apr</span><span class="detail-val">Slapton Sands & Ley nature reserve. Cricket Inn at Beesands for lunch. Explore Kingsbridge market town — Crabshell Inn for evening drink.</span></div>
+        <div class="detail-row"><span class="detail-label">Wed 23 Apr</span><span class="detail-val">Start Point & Prawle Point coastal walk (most southerly Devon point). Final evening at The Sloop Inn or Dolphin.</span></div>
+        <div class="detail-row"><span class="detail-label">Thu 24 Apr</span><span class="detail-val">Early walk. Pack up. Depart by 10:00 → Whitstable (check-in from 16:00).</span></div>
+      </div>
+    </div>
+
+  </div><!-- /devon-practical -->
+
+</div><!-- /trip-devon -->
+
+
+<!-- ═══════════════════════════════════════════
+     WHITSTABLE — MERMAID'S CAVE
+═══════════════════════════════════════════ -->
+<div class="trip-panel" id="trip-whitstable">
+
+  <!-- BEACHES -->
+  <div class="section active" id="whitstable-beaches">
+    <div class="section-title">Beaches</div>
+    <div class="section-desc">24 April – 8 May 2026 · Mermaid's Cave, 281 Faversham Road, CT5 4BN</div>
+
+    <div class="warning-box">
+      <strong>⚠️ Key Date — 1 May brings Tankerton restrictions</strong>
+      Your stay spans 1 May. From that date, Tankerton Beach (the stretch between Pier Avenue West and The Street) imposes a dog ban at beach level, though you can still walk on lead along the promenade. Whitstable's West Beach and Seasalter are unrestricted ALL YEAR. Check local signage as boundaries are clearly marked.
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Whitstable West Beach</div>
+          <div class="card-subtitle">Walking distance from Mermaid's Cave</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Shingle, divided by wooden groynes. Rock pools. Beach huts. West-facing sunsets.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs free, off lead, no restrictions whatsoever, all year round.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Runs from Whitstable harbour south toward Seasalter (~1 mile). Pass The Old Neptune pub directly on the seafront.</span></div>
+        <div class="detail-row"><span class="detail-label">Water quality</span><span class="detail-val">Check Southern Water alerts — pollution incidents do occur. Check before letting dog swim.</span></div>
+        <span class="policy-pill policy-all-year">🐾 All year, off lead, unrestricted</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Seasalter Beach</div>
+          <div class="card-subtitle">~5 min drive west, or 20 min walk along shore</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Shingle. Quieter than Whitstable. Oyster farm views. Flat promenade walk.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">Dogs welcome all year, off lead. No restrictions.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Walk all the way from Whitstable harbour to Seasalter past beach huts and fishing boats — around 1 mile. The Sportsman restaurant (Michelin starred) is nearby — dogs allowed if small.</span></div>
+        <span class="policy-pill policy-all-year">🐾 All year, off lead</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Tankerton Beach & The Street</div>
+          <div class="card-subtitle">~10 min walk east along the seafront</div>
+        </div>
+        <span class="badge badge-gold">Check Dates</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Shingle beach with grassy Tankerton Slopes behind. Famous "The Street" sand spit appears at low tide.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy (your dates)</span><span class="detail-val">24 April–30 April: fully off lead on beach. From 1 May: beach level between Pier Avenue West and The Street is restricted — dogs on lead on promenade only. Grassy slopes above beach: dogs off lead all year.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">"The Street" sand spit is spectacular at low tide — worth timing a visit. From 1 May stick to the Slopes above rather than the restricted beach level.</span></div>
+        <span class="policy-pill policy-lead">⚠️ From 1 May: restricted section</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Reculver Beach</div>
+          <div class="card-subtitle">~15 min drive east, near Herne Bay</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Shingle beach with iconic twin-towered ruined church on the clifftop (12th century). SSSI.</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">All year, no restrictions.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Connects to the Viking Coastal Trail. Dramatic skyline. Walk along the beach into Herne Bay (5 miles one-way). Great fossil hunting in the shingle.</span></div>
+        <span class="policy-pill policy-all-year">🐾 All year, off lead</span>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Herne Bay Beach (East of Pier)</div>
+          <div class="card-subtitle">~15 min drive</div>
+        </div>
+        <span class="badge badge-green">All Year</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Surface</span><span class="detail-val">Shingle and sand. Wide promenade. Herne Bay Pier (one of the longest in England).</span></div>
+        <div class="detail-row"><span class="detail-label">Dog policy</span><span class="detail-val">East of the pier: all year, no restrictions. West of the pier to Lane End: restricted from 1 May (dogs on lead on promenade). Stick east of pier from 1 May.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Great walking — combine with Reculver Towers for a 5-mile coastal section.</span></div>
+        <span class="policy-pill policy-all-year">🐾 All year (east of pier)</span>
+      </div>
+    </div>
+
+  </div><!-- /whitstable-beaches -->
+
+  <!-- PUBS -->
+  <div class="section" id="whitstable-pubs">
+    <div class="section-title">Pubs & Food</div>
+    <div class="section-desc">Whitstable is one of the most dog-friendly towns in the UK — almost every pub and café welcomes dogs</div>
+
+    <div class="card gold">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Old Neptune ("The Neppy")</div>
+          <div class="card-subtitle">The Whitstable icon — literally on the beach</div>
+        </div>
+        <span class="badge badge-green">Dogs Throughout</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">Marine Terrace, Island Wall, Whitstable, CT5 1EJ</span></div>
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Mon–Sat 11:30–20:30 · Sun 12:00–20:30</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dogs welcome inside and outside. Beer garden is essentially on the beach. One of the most photographed pubs in Kent.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Classic pub grub, local ales. Great for a pint with your boots off watching the sunset. Regular live music.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Can be a squeeze inside when busy — arrive early or sit outside on the beach terracing. Quintessentially Whitstable.</span></div>
+      </div>
+    </div>
+
+    <div class="card bark">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Pearson's Arms</div>
+          <div class="card-subtitle">Gastropub with excellent seasonal menu</div>
+        </div>
+        <span class="badge badge-green">Dogs in Bar</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">Horsebridge Road, Whitstable, CT5 1BT</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">01227 773133</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dogs welcome in the downstairs bar — food is also served down there. Upstairs restaurant is dogs-out by 9pm.</span></div>
+        <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-val">Lunch Tue–Sun 12–2:30pm · Dinner Tue–Sat 6:30–10:30pm · Breakfast Sat–Sun 8:30–11am</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Modern British with seasonal/local focus. Curry Night (1st & 3rd Wed, £10). Pie Night (2nd & 4th Wed, £10). Steak Night Thu (2 steaks + wine carafe, £25/person). Real ales, extensive wine list.</span></div>
+        <div class="detail-row"><span class="detail-label">Booking</span><span class="detail-val">Advisable for evenings — pearsonsarmswhitstable.co.uk or call.</span></div>
+        <a href="https://www.pearsonsarmswhitstable.co.uk" target="_blank" class="map-btn">🌐 pearsonsarmswhitstable.co.uk</a>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Duke of Cumberland</div>
+          <div class="card-subtitle">Historic pub at the top of the High Street</div>
+        </div>
+        <span class="badge badge-gold">Dogs in Bar/Courtyard</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">High Street, Whitstable, CT5 1AP</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-val">01227 280617</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dogs welcome in bar and courtyard. NOT in the restaurant dining area.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Contemporary dishes with finest seasonal local produce. Excellent courtyard garden. Live music venue.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Historic 1867 pub — boutique bedrooms upstairs if you want a longer stay in town. Popular with locals.</span></div>
+        <a href="https://www.dukeofcumberlandhotel.co.uk" target="_blank" class="map-btn">🌐 dukeofcumberlandhotel.co.uk</a>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Quayside</div>
+          <div class="card-subtitle">Family & dog-friendly opposite the harbour</div>
+        </div>
+        <span class="badge badge-green">Dogs Welcome</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">South Quay, Whitstable Harbour, CT5 1AB</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dog-friendly throughout. Popular with dog walkers coming off the beach. "Best roast in town" claim.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Home-made pub food, Sunday roasts, live music Fridays.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Right by the harbour market stalls — good before or after a harbour browse.</span></div>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Lobster Shack</div>
+          <div class="card-subtitle">East Quay seafood — outdoor & dog-friendly</div>
+        </div>
+        <span class="badge badge-green">Dogs Welcome</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">East Quay, Whitstable Harbour, CT5 1AB</span></div>
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dog-friendly — outdoor seating where you can watch the catch being landed.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Fresh lobster, crab, oysters, fish & chips, hot and cold seafood. Casual, outdoor eating in deckchairs. Perfect for a harbour lunch.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">Walk east along the harbour from the main town — popular, so go off-peak or early.</span></div>
+      </div>
+    </div>
+
+    <div class="card sea">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The Rock Lodge</div>
+          <div class="card-subtitle">Doggy menu & free food for dogs when you eat</div>
+        </div>
+        <span class="badge badge-green">Dogs Throughout</span>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Dog Policy</span><span class="detail-val">Dogs welcome throughout. Dedicated doggy menu (Beef Stew, Chicken in Gravy). Dog eats FREE when you dine.</span></div>
+        <div class="detail-row"><span class="detail-label">Menu</span><span class="detail-val">Sunday sharing roasts a speciality. Alpine ski-lodge aesthetic. Great brunch/lunch option.</span></div>
+        <div class="detail-row"><span class="detail-label">Note</span><span class="detail-val">One of the most dog-forward spots in Whitstable — the doggy menu alone is worth a visit.</span></div>
+      </div>
+    </div>
+
+  </div><!-- /whitstable-pubs -->
+
+  <!-- WALKS -->
+  <div class="section" id="whitstable-walks">
+    <div class="section-title">Walks</div>
+    <div class="section-desc">Coast, woodland & countryside around Whitstable</div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">1. Whitstable Harbour to Seasalter Shore Walk</div>
+          <div class="card-subtitle">2–4 miles (flexible) · 1–2 hrs · Easy · From the door</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Whitstable Harbour or West Beach (walkable from Mermaid's Cave)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead all year on this stretch. No restrictions.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">Walk west from the harbour along West Beach past The Old Neptune pub, coloured beach huts, fishermen's cottages and oyster farm buoys all the way to Seasalter. Return along the same shore path or cut back through Whitstable High Street.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Iconic Whitstable beach huts. Sunset views over the Thames Estuary. Peter Cushing's blue plaque. Oyster beds. The Neppy pub for a well-earned pint.</span></div>
+        <a href="https://www.alltrails.com/trail/england/kent/whitstable-shore-circular" target="_blank" class="map-btn">📍 AllTrails: Whitstable Shore</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">2. Whitstable to Tankerton Slopes & The Street</div>
+          <div class="card-subtitle">3–4 miles · 1.5 hrs · Easy</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Whitstable Harbour, walkable from accommodation</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead on the Slopes (above beach) all year. On beach level: unrestricted until 30 April, then on lead on promenade from 1 May between Pier Ave West and The Street.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">Walk east from the harbour past the beach huts to the grassy Tankerton Slopes. At low tide, walk out on "The Street" — a sand spit stretching into the estuary. Spectacular views. Return via the Slopes or continue to Whitstable Castle gardens (free entry, dogs in grounds).</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">"The Street" at low tide is extraordinary — water on both sides. Tankerton Slopes: off-lead running for dogs. Whitstable Castle gardens: free, dogs welcome in grounds.</span></div>
+        <a href="https://www.alltrails.com/trail/england/kent/whitstable-shore-circular" target="_blank" class="map-btn">📍 AllTrails</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">3. Crab & Winkle Way: Whitstable to Canterbury</div>
+          <div class="card-subtitle">7.6 miles (one way) · 3–4 hrs · Moderate · Historic railway path</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Whitstable Harbour OR Canterbury West Station (drive to one end, train back)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Dogs on leads on shared sections with cyclists. Keep to designated dog walking trail through Blean Woods.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">Follow the old Crab & Winkle railway line — one of the world's first steam passenger railways (1830) — from the harbour through 11+ square miles of ancient Blean Woods to Canterbury. Mostly traffic-free. Pass 13th-century church, ancient orchards, RSPB Blean Woods reserve.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Blean Woods in late April/May: spectacular bluebells and wild garlic. RSPB nature reserve with woodpeckers, nightingales, rare heath fritillary butterfly. Dogs have a designated trail through the woods.</span></div>
+        <div class="detail-row"><span class="detail-label">Tip</span><span class="detail-val">Drive to Canterbury, walk back to Whitstable (downhill). Train also runs between the two.</span></div>
+        <a href="https://www.alltrails.com/trail/england/kent/clowes-wood-and-crab-and-winkle-way-circular" target="_blank" class="map-btn">📍 AllTrails: Crab & Winkle</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">4. Blean Woods Circular (Clowes Wood)</div>
+          <div class="card-subtitle">3.6 miles · 1–1.5 hrs · Easy · Ancient woodland</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Clowes Wood car park, off Radfall Road, Whitstable (~10 min drive)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Keep to designated dog walking route through the SSSI woodland.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">Hard surfaced accessible circular path through 236 hectares of Blean woodland, linking to the Crab & Winkle Way. Ponds, glades, ancient oaks, conifer sections.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Late April/May: bluebells outstanding. Best place in England to hear nightjars. Rare heath fritillary butterfly. Good muddy-day option — hard path throughout.</span></div>
+        <a href="https://www.alltrails.com/trail/england/kent/clowes-wood-and-crab-and-winkle-way-circular" target="_blank" class="map-btn">📍 AllTrails: Clowes Wood</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">5. Whitstable to Herne Bay Coastal Path</div>
+          <div class="card-subtitle">5 miles (one way) · 2–2.5 hrs · Easy · Flat coastal walk</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Whitstable Harbour, walking east</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead on Whitstable beaches. From 1 May keep to promenade on Tankerton section. Herne Bay east of pier: all year off lead.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">Follow the seafront path east from Whitstable through Tankerton, past Swalecliffe to Herne Bay and its pier. Flat and leisurely, dog-friendly refreshment stops en route. Return by bus or taxi.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Herne Bay Pier (one of Britain's longest). Colourful beach huts. Broad sea views across the Thames Estuary. Multiple café and pub stops.</span></div>
+        <a href="https://www.alltrails.com/trail/england/kent/whitstable-swalecliffe-and-herne-bay" target="_blank" class="map-btn">📍 AllTrails: Whitstable–Herne Bay</a>
+      </div>
+    </div>
+
+    <div class="card grass">
+      <div class="card-header">
+        <div>
+          <div class="card-title">6. Reculver Towers & Coastal Circuit</div>
+          <div class="card-subtitle">3–5 miles · 1.5–2.5 hrs · Easy · Viking Coastal Trail</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Start</span><span class="detail-val">Reculver Country Park car park (~15 min drive east)</span></div>
+        <div class="detail-row"><span class="detail-label">Dogs</span><span class="detail-val">Off lead all year on beach and clifftop. Keep away from cliff edges.</span></div>
+        <div class="detail-row"><span class="detail-label">Route</span><span class="detail-val">Park at Reculver and explore the country park, then drop to the shingle beach past the iconic twin-towered ruined church (12th century). Walk the beach east toward Herne Bay or west along the cliff path. Connect to the Viking Coastal Trail.</span></div>
+        <div class="detail-row"><span class="detail-label">Highlights</span><span class="detail-val">Reculver Towers dominate the skyline — used as a navigational aid by sailors for centuries. Fossil hunting in shingle. Skylark song in spring.</span></div>
+        <a href="https://www.alltrails.com/explore/england/kent/reculver" target="_blank" class="map-btn">📍 AllTrails: Reculver</a>
+      </div>
+    </div>
+
+  </div><!-- /whitstable-walks -->
+
+  <!-- ROUTES -->
+  <div class="section" id="whitstable-routes">
+    <div class="section-title">Route</div>
+    <div class="section-desc">Driving route to be added by Lana</div>
+    <div class="card bark">
+      <div class="card-body">
+        <p style="color:var(--text-mid); font-size:0.88rem; padding: 12px 0;">Route details to be provided. Accommodation: <strong>Mermaid's Cave, 281 Faversham Road, Whitstable, Kent, CT5 4BN</strong>. Arrival from <strong>16:00 on 24 April</strong>. Departure by <strong>10:00 on 8 May</strong>.</p>
+      </div>
+    </div>
+  </div><!-- /whitstable-routes -->
+
+  <!-- PRACTICAL -->
+  <div class="section" id="whitstable-practical">
+    <div class="section-title">Practical</div>
+    <div class="section-desc">Essential info for the Whitstable leg</div>
+
+    <div class="card gold">
+      <div class="card-header"><div><div class="card-title">🏠 Accommodation</div></div></div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Property</span><span class="detail-val">Mermaid's Cave</span></div>
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-val">281 Faversham Road, Whitstable, Kent, CT5 4BN</span></div>
+        <div class="detail-row"><span class="detail-label">Arrival</span><span class="detail-val">Friday 24 April 2026 from 16:00</span></div>
+        <div class="detail-row"><span class="detail-label">Departure</span><span class="detail-val">Friday 8 May 2026 before 10:00</span></div>
+        <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-val">14 nights — your longest stay</span></div>
+        <div class="detail-row"><span class="detail-label">Booking ref</span><span class="detail-val">3821693 · holidaycottages.co.uk</span></div>
+        <div class="detail-row"><span class="detail-label">Previous leg</span><span class="detail-val">Arriving from 3 Gabberwell Cottages, Devon · depart 24 April by 10:00</span></div>
+      </div>
+    </div>
+
+    <div class="practical-grid">
+      <div class="practical-tile">
+        <div class="icon">🏥</div>
+        <div class="p-title">Nearest Vet</div>
+        <div class="p-val">Animed Veterinary Centre</div>
+        <div class="p-sub">1 Beresford Road, Whitstable CT5 1JP · 01227 273005. Out of hours: MiNightVet Canterbury.</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🦞</div>
+        <div class="p-title">Whitstable Oyster Season</div>
+        <div class="p-val">May–October peak</div>
+        <div class="p-sub">Native oysters in season. Don't feed raw oysters to your dog — cooked only if you want to share!</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">⚠️</div>
+        <div class="p-title">Water Quality Alerts</div>
+        <div class="p-val">Check before swimming</div>
+        <div class="p-sub">Southern Water pollution incidents at Whitstable are not uncommon. Check <a href="https://www.sas.org.uk/beach-info" target="_blank">sas.org.uk</a> before sea swimming.</div>
+      </div>
+      <div class="practical-tile">
+        <div class="icon">🚌</div>
+        <div class="p-title">Canterbury Day Trip</div>
+        <div class="p-val">25 min by car / train</div>
+        <div class="p-sub">Regular trains. Dogs welcome on Southeastern trains. Cathedral grounds dog-friendly.</div>
+      </div>
+    </div>
+
+    <div class="card bark">
+      <div class="card-header"><div><div class="card-title">📅 Suggested Highlights (14 nights)</div></div></div>
+      <div class="card-body">
+        <div class="detail-row"><span class="detail-label">Fri 24 Apr</span><span class="detail-val">Arrive from 16:00. Evening harbour walk. Dinner at The Old Neptune (or Pearson's Arms — book).</span></div>
+        <div class="detail-row"><span class="detail-label">Sat 25 Apr</span><span class="detail-val">West Beach & Seasalter morning walk. Explore Whitstable Harbour Market. Lobster Shack lunch. Tankerton Slopes afternoon (still unrestricted on beach until 30 Apr).</span></div>
+        <div class="detail-row"><span class="detail-label">Sun 26 Apr</span><span class="detail-val">Walk to The Street at low tide — check tide times. Sunday roast at Pearson's Arms or The Quayside (book). Whitstable Castle gardens.</span></div>
+        <div class="detail-row"><span class="detail-label">Mon 27 Apr</span><span class="detail-val">Reculver Towers & beach walk. Fossil hunting. Explore Herne Bay. Return along the coastal path.</span></div>
+        <div class="detail-row"><span class="detail-label">Tue 28–Thu 30 Apr</span><span class="detail-val">Final days with unrestricted Tankerton beach. Enjoy morning off-lead beach runs before restrictions begin 1 May.</span></div>
+        <div class="detail-row"><span class="detail-label">From 1 May</span><span class="detail-val">Shift to Whitstable West Beach, Seasalter (both all-year unrestricted). Tankerton Slopes for off-lead runs above the restricted zone.</span></div>
+        <div class="detail-row"><span class="detail-label">Mid-stay</span><span class="detail-val">Crab & Winkle Way to Canterbury — walk one way, train back. Blean Woods bluebells (peak late April/early May). Day trip to Faversham (Saxon Shore Way, dog-friendly brewery).</span></div>
+        <div class="detail-row"><span class="detail-label">Fri 8 May</span><span class="detail-val">Early harbour walk. Pack up and head home.</span></div>
+      </div>
+    </div>
+
+  </div><!-- /whitstable-practical -->
+
+</div><!-- /trip-whitstable -->
+
+</main>
+
+<script>
+  let currentTrip = 'newquay';
+  let currentTab = 'beaches';
+
+  function switchTrip(trip) {
+    currentTrip = trip;
+
+    // toggle trip panels
+    document.querySelectorAll('.trip-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('trip-' + trip).classList.add('active');
+
+    // toggle trip buttons
+    document.querySelectorAll('.trip-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // update header meta
+    const meta = {
+      newquay: 'Newquay, Cornwall · 28 March – 11 April 2026',
+      brean: 'Brean, Somerset · 10 – 17 April 2026',
+      devon: 'Kingston, Devon · 17 – 24 April 2026',
+      whitstable: 'Whitstable, Kent · 24 April – 8 May 2026'
+    };
+    document.getElementById('trip-meta-header').textContent = meta[trip];
+
+    // keep current tab active in new trip
+    switchTab(currentTab, true);
+  }
+
+  function switchTab(tab, silent) {
+    currentTab = tab;
+
+    // hide all sections in current trip
+    const tripPanel = document.getElementById('trip-' + currentTrip);
+    tripPanel.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+    // show target section
+    const targetSection = document.getElementById(currentTrip + '-' + tab);
+    if (targetSection) targetSection.classList.add('active');
+
+    // update tab buttons
+    if (!silent) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  }
+
+  // handle tab clicks when switching trip (no event)
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    const tabs = ['beaches', 'pubs', 'walks', 'routes', 'practical'];
+    btn.addEventListener('click', function() {
+      currentTab = tabs[i % 5];
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const tripPanel = document.getElementById('trip-' + currentTrip);
+      tripPanel.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+      const targetSection = document.getElementById(currentTrip + '-' + currentTab);
+      if (targetSection) targetSection.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
