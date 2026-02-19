@@ -398,8 +398,8 @@
     <button class="tab-btn active" onclick="switchTab('beaches')">🏖 Beaches</button>
     <button class="tab-btn" onclick="switchTab('pubs')">🍺 Pubs & Food</button>
     <button class="tab-btn" onclick="switchTab('walks')">🥾 Walks</button>
-    <button class="tab-btn" onclick="switchTab('routes')">🚗 Route</button>
     <button class="tab-btn" onclick="switchTab('practical')">ℹ️ Practical</button>
+    <button class="tab-btn" onclick="switchTab('routes')">🚗 Route</button>
   </nav>
 </header>
 
@@ -1304,8 +1304,8 @@
     <div class="section-desc">Newquay → Brean with dog-friendly stops</div>
 
     <div class="info-box">
-      <strong>🚗 Newquay → Brean · ~100 miles · approx. 2–2.5 hours driving</strong>
-      Depart Newquay by 10:00 on 11 April. Route: A30 → A39/A38 → M5 North → Jct 22. Arrival at Sea Holm from 15:30.
+      <strong>🚗 Newquay → Brean · ~130 miles · approx. 3–3.5 hours with stops</strong>
+      Depart Newquay by 10:00 on 11 April. Route: A30 → A38 → M5 North → Jct 22. Stops: Bodmin Moor stretch + Killerton (NT, EX5 3LE) for a proper dog walk and coffee. Arrival at Sea Holm from 15:30.
     </div>
 
     <div class="card bark">
@@ -1330,26 +1330,41 @@
         <div class="route-step">
           <div class="route-step-num">3</div>
           <div class="route-step-body">
-            <div class="route-step-title">A30 → A38 → M5 North</div>
-            <div class="route-step-detail">Cross into Devon at Launceston. Join M5 at Exeter. Head north through Somerset.</div>
+            <div class="route-step-title">A30 → A38 → M5 North → J29 off for Killerton</div>
+            <div class="route-step-detail">Cross into Devon at Launceston. Join A38 north, then M5 at Exeter. Exit at J29 for Killerton.</div>
           </div>
         </div>
         <div class="route-step">
           <div class="route-step-num">4</div>
           <div class="route-step-body">
-            <div class="route-step-title">Stop 2: Taunton Deane Services (M5, Jct 25 area) · ~1.5 hrs</div>
-            <div class="route-step-detail">Grass areas and walk space. Toilets, food, Costa. Good midpoint break.</div>
+            <div class="route-step-title">Stop 2: Killerton, National Trust · EX5 3LE · ~1hr 45min from Bodmin</div>
+            <div class="route-step-detail" style="margin-bottom:8px;">Suggested stop: 1–1.5 hours · NT members free, otherwise £13/adult</div>
+            <div class="route-step-detail">A magnificent NT estate — 6,400 acres of parkland, orchards and woodland. Dogs on leads in the formal garden; off lead in the wider parkland once past visitor reception. <strong>Dog-specific perks:</strong> water bowls and waste bins throughout, doggy rinsing station in the car park, doggy ice cream at the Stables Coffee Shop. The Stables Coffee Shop is dog-friendly inside — good for a proper sit-down break. EV charging available. <strong>Nav note:</strong> postcode EX5 3LE works but follow the brown NT signs — do not go up the main drive to the house; follow signs to the visitor car park.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">↓</div>
+          <div class="route-step-body">
+            <div class="route-step-title" style="color:var(--text-light); font-weight:400;">B3181 → M5 North · approx. 45min driving</div>
+            <div class="route-step-detail">Rejoin M5 northbound at J29 or J28. Head north through Somerset.</div>
           </div>
         </div>
         <div class="route-step">
           <div class="route-step-num">5</div>
+          <div class="route-step-body">
+            <div class="route-step-title">Stop 3: Taunton Deane Services (M5, Jct 25 area)</div>
+            <div class="route-step-detail">Optional quick break if needed — grass areas, toilets, Costa. You're only ~30 min from Brean at this point.</div>
+          </div>
+        </div>
+        <div class="route-step">
+          <div class="route-step-num">6</div>
           <div class="route-step-body">
             <div class="route-step-title">M5 → Jct 22 (Burnham-on-Sea)</div>
             <div class="route-step-detail">Leave motorway at Junction 22. Follow B3140 signs to Burnham-on-Sea then Brean.</div>
           </div>
         </div>
         <div class="route-step">
-          <div class="route-step-num">6</div>
+          <div class="route-step-num">7</div>
           <div class="route-step-body">
             <div class="route-step-title">Arrive: Sea Holm, Warren Road, Brean TA8 2RR</div>
             <div class="route-step-detail">Check-in from 15:30. The Brean Down Inn is 100m away. Brean Beach is on your doorstep.</div>
@@ -2262,13 +2277,22 @@
   function switchTrip(trip) {
     currentTrip = trip;
 
-    // toggle trip panels
-    document.querySelectorAll('.trip-panel').forEach(p => p.classList.remove('active'));
+    // hide all trip panels and clear all active sections inside them
+    document.querySelectorAll('.trip-panel').forEach(p => {
+      p.classList.remove('active');
+      p.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    });
+
+    // show the selected trip panel
     document.getElementById('trip-' + trip).classList.add('active');
 
-    // toggle trip buttons
-    document.querySelectorAll('.trip-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+    // update trip buttons
+    document.querySelectorAll('.trip-btn').forEach(b => {
+      b.classList.remove('active');
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + trip + "'")) {
+        b.classList.add('active');
+      }
+    });
 
     // update header meta
     const meta = {
@@ -2279,43 +2303,30 @@
     };
     document.getElementById('trip-meta-header').textContent = meta[trip];
 
-    // keep current tab active in new trip
-    switchTab(currentTab, true);
+    // show the correct section for the current tab in the new trip
+    const targetSection = document.getElementById(trip + '-' + currentTab);
+    if (targetSection) targetSection.classList.add('active');
   }
 
-  function switchTab(tab, silent) {
+  function switchTab(tab) {
     currentTab = tab;
 
-    // hide all sections in current trip
-    const tripPanel = document.getElementById('trip-' + currentTrip);
-    tripPanel.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    // hide all sections everywhere
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
 
-    // show target section
+    // show only the target section in the current trip
     const targetSection = document.getElementById(currentTrip + '-' + tab);
     if (targetSection) targetSection.classList.add('active');
 
     // update tab buttons
-    if (!silent) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-    }
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + tab + "'")) {
+        b.classList.add('active');
+      }
+    });
   }
 
-  // handle tab clicks when switching trip (no event)
-  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-    const tabs = ['beaches', 'pubs', 'walks', 'routes', 'practical'];
-    btn.addEventListener('click', function() {
-      currentTab = tabs[i % 5];
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-
-      const tripPanel = document.getElementById('trip-' + currentTrip);
-      tripPanel.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-
-      const targetSection = document.getElementById(currentTrip + '-' + currentTab);
-      if (targetSection) targetSection.classList.add('active');
-    });
-  });
 </script>
 
 </body>
