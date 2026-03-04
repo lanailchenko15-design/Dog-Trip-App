@@ -70,9 +70,8 @@
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-bottom: 2px;
-    max-width: 100%;
-    min-width: 0;
+    padding: 0 0 12px 0;
+    width: 100%;
   }
   .trip-toggle::-webkit-scrollbar { display: none; }
 
@@ -381,7 +380,6 @@
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     .header-top { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .trip-toggle { align-self: stretch; max-width: 100%; }
     .card-header { flex-direction: column; }
   }
 </style>
@@ -394,13 +392,13 @@
       <div class="logo">🐾 Lana <span>&</span> Dog</div>
       <div class="trip-meta" id="trip-meta-header">Cornwall · Somerset · Devon · Kent · Spring 2026</div>
     </div>
-    <div class="trip-toggle">
+  </div>
+  <div class="trip-toggle">
       <button class="trip-btn active" onclick="switchTrip('newquay')">Newquay</button>
       <button class="trip-btn" onclick="switchTrip('brean')">Brean</button>
       <button class="trip-btn" onclick="switchTrip('devon')">Devon</button>
       <button class="trip-btn" onclick="switchTrip('whitstable')">Whitstable</button>
       <button class="trip-btn" onclick="switchTrip('dorset')">Dorset</button>
-    </div>
   </div>
   <nav>
     <button class="tab-btn active" onclick="switchTab('beaches')">🏖 Beaches</button>
